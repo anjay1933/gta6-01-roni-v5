@@ -1,0 +1,79 @@
+/* VICE LIGHTS — neon dusk interface.
+   Every HUD element is plain DOM layered over the WebGL canvas, so the
+   interface stays crisp while the 3D city renders behind it. */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #120a1e; font-family: Arial, Helvetica, sans-serif; color: #fff; }
+#app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#app canvas { touch-action: none; cursor: crosshair; }
+
+/* hurt flash: a red vignette that fades back out */
+#vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(255,0,40,0.55) 100%);
+  opacity: 0; transition: opacity 0.35s; }
+#crosshair { position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
+  font-size: 26px; font-weight: bold; color: rgba(255,255,255,0.9);
+  text-shadow: 0 0 6px #000; pointer-events: none; z-index: 6; display: none; }
+#prompt { position: fixed; left: 50%; bottom: 22%; transform: translateX(-50%);
+  background: rgba(10,8,20,0.85); border: 1px solid #ffe600; color: #ffe600;
+  padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 15px;
+  pointer-events: none; z-index: 6; display: none; }
+
+/* top-right: cash, health, ammo, wanted stars */
+#hud-top { position: fixed; top: 12px; right: 14px; z-index: 7; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+#cash-box { font-size: 26px; font-weight: bold; color: #39ff88; text-shadow: 0 2px 6px #000; }
+#health-box { display: flex; align-items: center; gap: 8px; }
+#health-bar { width: 170px; height: 14px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.5); border-radius: 3px; overflow: hidden; }
+#health-fill { height: 100%; width: 100%; background: #39ff88; transition: width 0.2s; }
+#health-text { font-size: 13px; font-weight: bold; text-shadow: 0 1px 4px #000; }
+#ammo-box { font-size: 15px; font-weight: bold; text-shadow: 0 1px 4px #000; }
+#wanted-box { text-align: right; }
+#stars { font-size: 24px; letter-spacing: 2px; }
+#stars .star { color: rgba(255,255,255,0.25); text-shadow: 0 0 4px #000; }
+#stars .star.lit { color: #ffd23a; text-shadow: 0 0 10px #ff9d00; }
+#wanted-label { font-size: 12px; font-weight: bold; letter-spacing: 2px; }
+
+/* top-left: mission title + objective */
+#objective-panel { position: fixed; top: 12px; left: 14px; z-index: 7; max-width: 420px;
+  background: rgba(10,8,20,0.72); border-left: 4px solid #ffe600; padding: 10px 14px; border-radius: 4px; }
+#mission-title { font-size: 14px; font-weight: bold; color: #ffe600; letter-spacing: 1px; }
+#objective { font-size: 15px; margin-top: 3px; line-height: 1.35; }
+
+/* message feed under the objective */
+#feed { position: fixed; left: 14px; top: 110px; z-index: 7; display: flex; flex-direction: column; gap: 5px; max-width: 440px; }
+.feed-msg { background: rgba(10,8,20,0.8); border-left: 3px solid #00e5ff; padding: 7px 10px; border-radius: 3px; font-size: 14px; line-height: 1.35; }
+
+/* circular minimap, bottom-left */
+#minimap-wrap { position: fixed; left: 14px; bottom: 14px; z-index: 7; }
+#minimap { display: block; border-radius: 50%; border: 3px solid rgba(255,255,255,0.55); box-shadow: 0 0 18px rgba(0,0,0,0.7); background: #0c0a18; }
+#minimap-label { text-align: center; font-size: 11px; letter-spacing: 3px; margin-top: 4px; color: rgba(255,255,255,0.85); text-shadow: 0 1px 4px #000; }
+
+/* speedometer + controls, bottom-right */
+#hud-bottom { position: fixed; right: 14px; bottom: 14px; z-index: 7; text-align: right; }
+#speed { font-size: 30px; font-weight: bold; text-shadow: 0 2px 8px #000; }
+#controls-hint { font-size: 11px; color: rgba(255,255,255,0.75); text-shadow: 0 1px 4px #000; margin-top: 4px; max-width: 420px; }
+
+/* full-screen menu / pause / end screens */
+.screen { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, rgba(26,8,46,0.88), rgba(80,20,50,0.72) 55%, rgba(10,8,20,0.9)); }
+.menu-inner { max-width: 640px; padding: 28px 34px; text-align: center; }
+.menu-inner.small { max-width: 520px; }
+.kicker { letter-spacing: 4px; font-size: 12px; color: #00e5ff; font-weight: bold; }
+#game-title { font-size: 72px; margin: 8px 0 4px; letter-spacing: 2px; line-height: 1;
+  background: linear-gradient(180deg, #ffe600, #ff2d78 70%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 0 34px rgba(255,45,120,0.45); }
+h2 { font-size: 44px; margin: 6px 0; letter-spacing: 2px; }
+h2.red { color: #ff4040; text-shadow: 0 0 24px rgba(255,40,40,0.6); }
+h2.gold, .gold { color: #ffe600; }
+.tagline { font-size: 16px; line-height: 1.5; color: rgba(255,255,255,0.92); }
+.features { font-size: 13px; letter-spacing: 1px; color: #9be8ff; }
+.menu-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 18px 0 8px; }
+.btn { font-family: inherit; font-size: 17px; font-weight: bold; letter-spacing: 1px; cursor: pointer;
+  padding: 12px 30px; min-width: 260px; border-radius: 6px; border: 2px solid #fff;
+  background: rgba(255,255,255,0.1); color: #fff; }
+.btn:hover { background: rgba(255,255,255,0.25); }
+.btn.primary { background: #ff2d78; border-color: #ff2d78; box-shadow: 0 0 22px rgba(255,45,120,0.55); }
+.btn.primary:hover { background: #ff4d8d; }
+.save-note { font-size: 13px; color: #c8c8d8; min-height: 16px; }
+.controls-box { margin-top: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px;
+  background: rgba(0,0,0,0.35); font-size: 13px; line-height: 1.7; display: flex; flex-direction: column; }
+.fine { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 14px; line-height: 1.4; }

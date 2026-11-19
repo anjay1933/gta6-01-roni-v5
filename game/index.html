@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VICE LIGHTS — Neon Bay | Open-World Crime Game</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js" } }
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- red flash at the screen edge when Jax takes a hit -->
+<div id="vignette"></div>
+<!-- aiming crosshair, shown only on foot -->
+<div id="crosshair">+</div>
+<!-- contextual "E — ..." prompt above the speedometer -->
+<div id="prompt"></div>
+
+<!-- top-right cluster: cash, health, ammo, wanted stars -->
+<div id="hud-top">
+  <div id="cash-box"><span id="cash">$250</span></div>
+  <div id="health-box">
+    <div id="health-bar"><div id="health-fill"></div></div>
+    <span id="health-text">100 HP</span>
+  </div>
+  <div id="ammo-box">AMMO <span id="ammo">12 / 60</span></div>
+  <div id="wanted-box">
+    <div id="stars"></div>
+    <div id="wanted-label">CLEAN</div>
+  </div>
+</div>
+
+<!-- current mission and objective, top-left -->
+<div id="objective-panel">
+  <div id="mission-title">VICE LIGHTS</div>
+  <div id="objective">Follow the yellow M to your first job.</div>
+</div>
+
+<!-- scrolling story / event messages -->
+<div id="feed"></div>
+
+<!-- circular minimap, bottom-left -->
+<div id="minimap-wrap">
+  <canvas id="minimap" width="190" height="190"></canvas>
+  <div id="minimap-label">NEON BAY</div>
+</div>
+
+<!-- speedometer + control reminder, bottom-right -->
+<div id="hud-bottom">
+  <div id="speed"></div>
+  <div id="controls-hint">WASD move/drive · Mouse drag camera · E enter car · F/click shoot · V punch · R reload · Space handbrake · Shift sprint · P pause · M mute</div>
+</div>
+
+<!-- start screen -->
+<div id="menu" class="screen">
+  <div class="menu-inner">
+    <div class="kicker">NEON BAY · AN OPEN-WORLD CRIME GAME</div>
+    <h1 id="game-title">VICE LIGHTS</h1>
+    <p class="tagline">Sunset over the bay. Neon on the streets. Jax Marlowe is the best getaway driver in Neon Bay — and Mara Voss has six jobs that will make him rich or get him killed.</p>
+    <p class="features">Drive · Steal cars · Lose the cops · 6 story missions · Combat · Wanted levels 1–5 · Save &amp; continue</p>
+    <div class="menu-buttons">
+      <button id="start-btn" class="btn primary">▶ NEW GAME</button>
+      <button id="continue-btn" class="btn">↻ CONTINUE</button>
+    </div>
+    <p id="save-note" class="save-note"></p>
+    <div class="controls-box">
+      <b>HOW TO PLAY</b>
+      <span>WASD — walk / drive &nbsp;·&nbsp; Mouse drag — orbit camera &nbsp;·&nbsp; Wheel — zoom</span>
+      <span>E — enter / steal / exit car &nbsp;·&nbsp; F or click — shoot &nbsp;·&nbsp; V — punch &nbsp;·&nbsp; R — reload</span>
+      <span>Space — handbrake &nbsp;·&nbsp; Shift — sprint &nbsp;·&nbsp; P — pause &amp; save &nbsp;·&nbsp; M — mute</span>
+      <span>Follow the yellow <b class="gold">M</b> beacon and the diamond on the minimap to your next job.</span>
+    </div>
+    <p class="fine">An original game. Neon Bay, Jax Marlowe, Mara Voss and the Red Jacks are invented for this game — no part of any commercial game is used.</p>
+  </div>
+</div>
+
+<!-- pause screen -->
+<div id="pause" class="screen" style="display:none">
+  <div class="menu-inner small">
+    <h2>PAUSED</h2>
+    <p class="tagline">Neon Bay waits for no one — except right now.</p>
+    <div class="menu-buttons">
+      <button id="resume-btn" class="btn primary">▶ RESUME</button>
+      <button id="save-btn" class="btn">💾 SAVE GAME</button>
+      <button id="mute-btn" class="btn">🔊 SOUND</button>
+      <button id="quit-menu-btn" class="btn">≡ MAIN MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- caught by the police -->
+<div id="busted" class="screen" style="display:none">
+  <div class="menu-inner small">
+    <h2 class="red">BUSTED!</h2>
+    <p id="busted-stats" class="tagline"></p>
+    <div class="menu-buttons">
+      <button id="respawn-btn" class="btn primary">↻ BACK ON THE STREETS</button>
+    </div>
+  </div>
+</div>
+
+<!-- killed in action -->
+<div id="wasted" class="screen" style="display:none">
+  <div class="menu-inner small">
+    <h2 class="red">WASTED</h2>
+    <p id="wasted-stats" class="tagline"></p>
+    <div class="menu-buttons">
+      <button id="respawn2-btn" class="btn primary">↻ WAKE UP AT ST. LUMEN</button>
+    </div>
+  </div>
+</div>
+
+<!-- all six jobs done -->
+<div id="finale" class="screen" style="display:none">
+  <div class="menu-inner small">
+    <h2 class="gold">THE GETAWAY — COMPLETE</h2>
+    <p id="final-stats" class="tagline"></p>
+    <div class="menu-buttons">
+      <button id="finale-roam-btn" class="btn primary">▶ FREE ROAM NEON BAY</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
